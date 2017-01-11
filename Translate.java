@@ -38,8 +38,6 @@ import java.io.PrintStream;
 
 public class Translate
 {
-	private static Process procReplay;
-	
 	public static void main(String[] args) 
 	{
 		//ARG[0] = location of getevent log
@@ -56,16 +54,6 @@ public class Translate
 		int sameCounter = 0;
 		boolean allEventsValid = false;
 		
-		File wd = new File("/bin");
-				
-		try 
-		{
-			procReplay = Runtime.getRuntime().exec("/bin/bash", null, wd);
-		}
-		catch (IOException e) {e.printStackTrace();}
-		
-		if(procReplay != null) 
-		{
 			String eventsFilePath = args[0];
 			String splitEventOn = ",";
 			String[] validEventNumbers = null;
@@ -303,9 +291,13 @@ public class Translate
 					}				
 				}//end of while controlling the sending events from the log\
 				
-			} catch (IOException e1) {e1.printStackTrace();}
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			} catch (Exception ex) {
+				System.out.printf("Invalid line {%s}. Ignore~\n", line);
+			}
 			
-			System.out.println("Total number of events written is" + written);
+			System.out.println("Total number of events written is " + written);
 			
 			try
 			{
@@ -314,7 +306,6 @@ public class Translate
 				fileReader.close();				
 			}catch (Exception e) {e.printStackTrace(); System.out.println("Error!");}
 				
-		}//end of if process was Good
 	}	
 	
 	static long hexToLong(String hex)

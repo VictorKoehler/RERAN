@@ -27,7 +27,7 @@ log, e.g., translatedEvents.txt, onto the phone. Fourth, run the Replay
 program using the adb shell.
 
 
-####ARM Cross-compiler
+####Compile Replay Agent
 
 In order for the replay program to run on Android devices, they must be compiled using a cross-compiler for ARM CPU's. If you already have an ARM cross-compiler on your computer, then you are ready to go. If not, please find one that works with your operating system. The executable contained in our release was compiled on Linux. From our experience, finding and installing an ARM cross-compiler for Mac was difficult; it is possible, but included many hacks to get going, and is not recommended. 
 
@@ -39,6 +39,11 @@ After the ARM cross-compiler is installed, you can compile the source code using
   arm-none-linux-gnueabi-gcc -static -o replay replay.c
 ```
 
+If you're using x86 devices or emulator, you can use the following command to compile the replay agent.
+```
+  gcc -m32 -static -o replay replay.c
+```
+
 ####Running Example
 
 Push replay tool onto the phone: "/data/local" will be our local 
@@ -46,8 +51,12 @@ directory on the phone for the RERAN files. If it does not exist, it
 will be created. This step only needs to be done once.
 ```
     cd /path/to/android-sdk/platform-tools
-    
+
+    ./adb root
+
     ./adb push ./replay /data/local
+
+    ./adb shell chmod +x /data/local/replay
 ```    
 
 Record a trace: The getevent tool is part of the Android SDK. The "-tt" 
@@ -61,9 +70,11 @@ program are the path to the recorded events and the name of the translated
 events to output, respectively. There are also extra flags: see selective 
 replay and time-warping.
 ```
-    cd /path/to/translate.jar/
+    cd {RERAN_HOME}
+
+    javac Translate.java
     
-    java -jar translate.jar /path/to/recordedEvents.txt /path/to/android-sdk/platform-tools/translatedEvents.txt
+    java Translate /path/to/recordedEvents.txt /path/to/translatedEvents.txt
 ```    
 
 Push the translated recorded events onto the phone:
@@ -74,7 +85,7 @@ Push the translated recorded events onto the phone:
 Run the replay program (after your app is setup): See setting up your 
 app for more info.
 ```
-    ./adb shell /data/local/./replay /data/local/translatedEvents.txt
+    ./adb shell /data/local/replay /data/local/translatedEvents.txt
 ```    
 
 Please see the website www.androidreran.com for more info.
